@@ -29,21 +29,27 @@ function StartScreen({ numQuestions, dispatch, difficulty }) {
       <h2>Welcome to the React Quiz!</h2>
       <h3>{numQuestions} questions to test your React mastery</h3>
 
-      <div>
-        <label>How many questions would you like to answer?</label>
+      <div className="input-group">
+        <label htmlFor="question-limit">
+          How many questions would you like to answer?
+        </label>
+
         <input
           type="number"
-          placeholder="Choose a limit" // Placeholder instead of defaultValue
+          placeholder="Choose a limit" 
           onChange={handleLimitChange}
           min="1"
           max={numQuestions}
         />
       </div>
 
-      <div>
+      <div className="select-group">
         <label>Select Difficulty:</label>
 
-        <select value={difficulty} onChange={handleDifficultyChange}>
+        <select
+          value={difficulty}
+          onChange={handleDifficultyChange}
+        >
           <option value="all">All</option>
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
