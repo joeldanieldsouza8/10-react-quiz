@@ -1,0 +1,11 @@
+1.  Allow the user to select only a certain number of questions.
+
+2.  Allow the user to filter the difficulty of questions.
+
+3.  Upload the high score of the quiz to our fake API. 
+    As app reloads re-fetch the high score and place it back in our state
+    so that we don't lose that value.
+
+4.  Store all the answers in some array instead of just the current answer
+    like we do right now. And so by doing that, the user could then 
+    go back and forth in time and review their answers like that.

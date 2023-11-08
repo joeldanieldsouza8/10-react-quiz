@@ -21,11 +21,12 @@
 */
 
 function Options({ question, dispatch, answer }) {
-  const { options, correctOption, points: point } = question;
+  const { options, correctOption } = question;
   const hasAnswered = answer !== null;
 
   function handleClick(index) {
-    dispatch({ type: "newAnswer", payload: index });
+    const action = { type: "newAnswer", payload: index };
+    dispatch(action);
   }
 
   return (
