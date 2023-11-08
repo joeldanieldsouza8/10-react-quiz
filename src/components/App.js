@@ -24,8 +24,7 @@ const intialStateObj = {
   secondsRemaining: null, // The 'secondsRemaining' property will be used to keep track of the number of seconds remaining for the user to answer the current question.
   totalQuestions: 15, // This represents the total questions received from the backend
   selectedQuestionsLimit: null, // This represents the number of questions the user wants to answer
-  // filterQuestions: [], // This represents the filtered questions based on the difficulty level
-  // difficulty: "all", // This represents the difficulty level selected by the user
+  difficulty: "all", // This represents the difficulty level selected by the user
 };
 
 // Action Types as CONSTANTS
@@ -38,6 +37,7 @@ const NEXT_QUESTION = "nextQuestion";
 const RESET = "reset";
 const TICK = "tick";
 const SET_QUESTION_LIMIT = "setQuestionLimit";
+const SET_DIFFICULTY = "setDifficulty";
 
 function shuffleArray(array) {
   const shuffledArray = [...array]; // Create a copy of the original array
@@ -61,6 +61,7 @@ function reducer(state, action) {
     secondsRemaining,
     status,
     selectedQuestionsLimit,
+    difficulty,
   } = state;
 
   const { type, payload } = action;
@@ -74,13 +75,23 @@ function reducer(state, action) {
 
     case START:
       // Shuffle the questions array
-      const shuffledQuestions = shuffleArray(questions);
-      // If selectedQuestionsLimit is null, use the total number of questions
-      const effectiveQuestionLimit = selectedQuestionsLimit ?? questions.length;
-      // Slice the shuffled questions array to the selected limit
+      let shuffledQuestions = shuffleArray(questions);
+
+      // Filter the questions array based on the difficulty level set by the user, if not set to 'all'
+      if (difficulty !== "all") {
+        shuffledQuestions = shuffledQuestions.filter(
+          (question) => question.difficulty === difficulty
+        );
+      }
+
+      // Use the total number of questions after filtering, if no limit set
+      const effectiveQuestionsLimit =
+        selectedQuestionsLimit || shuffledQuestions.length;
+
+      // Slice the shuffled questions array to the limit set by the user
       const selectedQuestions = shuffledQuestions.slice(
         0,
-        effectiveQuestionLimit
+        effectiveQuestionsLimit
       );
 
       return {
@@ -106,7 +117,7 @@ function reducer(state, action) {
         answer: payload,
         // If the user's answer is correct, add the points for the current question to the 'points' property. Otherwise, keep the 'points' property as it is.
         points:
-          payload === question.correctOption 
+          payload === question.correctOption
             ? points + question.points
             : points,
       };
@@ -146,6 +157,13 @@ function reducer(state, action) {
         selectedQuestionsLimit: Math.min(payload, questions.length),
       };
 
+    case SET_DIFFICULTY:
+      // Instead of directly filtering here, we simply set the difficulty
+      return {
+        ...state,
+        difficulty: payload,
+      };
+
     default:
       throw new Error(`Invalid action type: ${type}`);
   }
@@ -153,6 +171,7 @@ function reducer(state, action) {
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, intialStateObj);
+
   const {
     questions,
     status,
@@ -161,6 +180,7 @@ export default function App() {
     points,
     highScore,
     secondsRemaining,
+    difficulty,
   } = state;
 
   // Derived state
@@ -192,8 +212,9 @@ export default function App() {
     /* 
       By adding status to the dependency array of the useEffect hook, you ensure that every time the status changes to "ready", which will happen after a RESET, it will refetch the questions.
       This will update the questions in the state to the full original list whenever the RESET action is dispatched and the status is set to "ready".
+      Include 'difficulty' in the dependency array so that it does not refetch questions when difficulty changes.
     */
-  }, [status]);
+  }, [status, difficulty]);
 
   return (
     <div className="app">
@@ -203,7 +224,11 @@ export default function App() {
         {status === "loading" && <Loader />}
         {status === "error" && <Error />}
         {status === "ready" && (
-          <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
+          <StartScreen
+            numQuestions={numQuestions}
+            dispatch={dispatch}
+            difficulty={difficulty}
+          />
         )}
         {status === "active" && (
           <>

@@ -41,8 +41,7 @@ function FinishScreen({ points, maxPossiblePoints, highScore, dispatch }) {
   return (
     <>
       <p className="result">
-        <span>{emoji}</span> You scored <strong>{points}</strong> out of
-        {maxPossiblePoints} points ({percentage}%)
+        <span>{emoji}</span> You scored <strong>{points}</strong> out of {maxPossiblePoints} points ({percentage}%)
       </p>
 
       <p className="highscore">(Highscore: {highScore} points)</p>
